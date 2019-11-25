@@ -33,8 +33,8 @@ func New() *Oauth {
 	}
 }
 
-// Handle handle http request
-func (o *Oauth) Handle() {
+// Init handle http request
+func (o *Oauth) Init() {
 	http.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
 		resp := o.server.NewResponse()
 		defer resp.Close()
@@ -66,6 +66,11 @@ func (o *Oauth) Handle() {
 		}
 		osin.OutputJSON(resp, w, r)
 	})
+}
+
+// Handle .
+func Handle(pattern string, handler func(req *http.Request) (data map[string]interface{})) {
+
 }
 
 // HandleLoginPage .
