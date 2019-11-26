@@ -1,7 +1,9 @@
 package oauth
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -33,8 +35,8 @@ func New() *Oauth {
 	}
 }
 
-// Init handle http request
-func (o *Oauth) Init() {
+// Authorize handle authorize request
+func (o *Oauth) Authorize() {
 	http.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
 		resp := o.server.NewResponse()
 		defer resp.Close()
@@ -47,11 +49,14 @@ func (o *Oauth) Init() {
 			o.server.FinishAuthorizeRequest(resp, r, ar)
 		}
 		if resp.IsError && resp.InternalError != nil {
-			fmt.Printf("ERROR: %s\n", resp.InternalError)
+			log.Printf("ERROR: %s\n", resp.InternalError)
 		}
 		osin.OutputJSON(resp, w, r)
 	})
+}
 
+// Token handle exchange
+func (o *Oauth) Token() {
 	// Access token endpoint
 	http.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		resp := o.server.NewResponse()
@@ -62,15 +67,28 @@ func (o *Oauth) Init() {
 			o.server.FinishAccessRequest(resp, r, ar)
 		}
 		if resp.IsError && resp.InternalError != nil {
-			fmt.Printf("ERROR: %s\n", resp.InternalError)
+			log.Printf("ERROR: %s\n", resp.InternalError)
 		}
 		osin.OutputJSON(resp, w, r)
 	})
 }
 
-// Handle .
-func Handle(pattern string, handler func(req *http.Request) (data map[string]interface{})) {
+// Middleware .
+func (o *Oauth) Middleware(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		resp := o.server.NewResponse()
+		defer resp.Close()
 
+		if ir := o.server.HandleInfoRequest(resp, r); ir != nil {
+			if resp.IsError {
+				osin.OutputJSON(resp, w, r)
+			} else {
+				// TODO: context set user info
+				handler(w, r)
+			}
+		}
+		osin.OutputJSON(resp, w, r)
+	}
 }
 
 // HandleLoginPage .
