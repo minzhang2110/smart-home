@@ -1,6 +1,7 @@
 package oauth
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,6 +21,8 @@ func New() *Oauth {
 	cfg := osin.NewServerConfig()
 	cfg.AllowGetAccessRequest = true
 	cfg.AllowClientSecretInParams = true
+	cfg.AllowedAccessTypes = osin.AllowedAccessType{osin.AUTHORIZATION_CODE, osin.REFRESH_TOKEN}
+	cfg.AccessExpiration = 3600*24*7
 
 	sto := storage.NewMemStorage()
 	client := &osin.DefaultClient{
@@ -34,8 +37,8 @@ func New() *Oauth {
 	}
 }
 
-// Authorize handle authorize request
-func (o *Oauth) Authorize() {
+// HandleAuthorizeToken handle authorize and token exchange request
+func (o *Oauth) HandleAuthorizeToken() {
 	http.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
 		resp := o.server.NewResponse()
 		defer resp.Close()
@@ -45,6 +48,7 @@ func (o *Oauth) Authorize() {
 				return
 			}
 			ar.Authorized = true
+			ar.UserData = os.Getenv("USER_NAME")
 			o.server.FinishAuthorizeRequest(resp, r, ar)
 		}
 		if resp.IsError && resp.InternalError != nil {
@@ -52,10 +56,7 @@ func (o *Oauth) Authorize() {
 		}
 		osin.OutputJSON(resp, w, r)
 	})
-}
 
-// Token handle exchange
-func (o *Oauth) Token() {
 	// Access token endpoint
 	http.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) {
 		resp := o.server.NewResponse()
@@ -72,6 +73,11 @@ func (o *Oauth) Token() {
 	})
 }
 
+type key int
+
+// UserName key
+const UserName key = 1
+
 // Middleware .
 func (o *Oauth) Middleware(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -82,8 +88,9 @@ func (o *Oauth) Middleware(handler http.HandlerFunc) http.HandlerFunc {
 			if resp.IsError {
 				osin.OutputJSON(resp, w, r)
 			} else {
-				// TODO: context set user info
-				handler(w, r)
+				ctx := context.WithValue(r.Context(), UserName, ir.AccessData.UserData)
+				handler(w, r.WithContext(ctx))
+				return
 			}
 		}
 		osin.OutputJSON(resp, w, r)

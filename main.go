@@ -1,10 +1,11 @@
 package main
 
 import (
-	"net/http"
+	"github.com/minzhang2110/smart-home/pkg/controllers"
+	"log"
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("..\\")))
-	http.ListenAndServe(":10081", nil)
+	h := controllers.NewHandler()
+	log.Error(controllers.New(h).Start(":" + os.Getenv("PORT")))
 }
