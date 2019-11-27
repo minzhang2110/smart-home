@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/minzhang2110/smart-home/pkg/controllers"
 	"log"
+	"os"
+
+	"github.com/minzhang2110/smart-home/pkg/controllers"
 )
 
 func main() {
 	h := controllers.NewHandler()
-	log.Error(controllers.New(h).Start(":" + os.Getenv("PORT")))
+	log.Fatal((controllers.NewRouter(h).Start(":" + os.Getenv("PORT"))))
 }
