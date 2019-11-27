@@ -26,7 +26,7 @@ type Response struct {
 }
 
 type Payload struct {
-	Commands []Command `json:"commands`
+	Commands []Command `json:"commands"`
 }
 
 type Command struct {
