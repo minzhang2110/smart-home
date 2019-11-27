@@ -1,9 +1,9 @@
 package sync
 
-import "github.com/minzhang2110/smart-home/pkg/action"
+import "github.com/minzhang2110/smart-home/pkg/actions"
 
 // Request .
-type Request action.Request
+type Request actions.Request
 
 // Response .
 type Response struct {
