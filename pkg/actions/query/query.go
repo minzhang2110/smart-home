@@ -15,6 +15,10 @@ type Request struct {
 
 // Response .
 type Response struct {
-	RequestID string                            `json:"requestId"`
-	Payload   map[string]map[string]interface{} `json:"payload"` // [id][type]status, "123":"on":true
+	RequestID string  `json:"requestId"`
+	Payload   Payload `json:"payload"`
+}
+
+type Payload struct {
+	Devices map[string]map[string]interface{} `json:"devices"` // [id][type]status, "123":"on":true
 }

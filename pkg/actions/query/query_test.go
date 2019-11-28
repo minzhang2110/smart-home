@@ -31,12 +31,14 @@ func TestQuery(t *testing.T) {
 
 	v, err := json.Marshal(&Response{
 		RequestID: "ff36a3cc-ec34-11e6-b1a0-64510650abcf",
-		Payload:   map[string]map[string]interface{}{"123": map[string]interface{}{"on": true, "online": true}},
+		Payload: Payload{
+			Devices: map[string]map[string]interface{}{"123": map[string]interface{}{"on": true, "online": true}},
+		},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	e := `{"requestId":"ff36a3cc-ec34-11e6-b1a0-64510650abcf","payload":{"123":{"on":true,"online":true}}}`
+	e := `{"requestId":"ff36a3cc-ec34-11e6-b1a0-64510650abcf","payload":{"devices":{"123":{"on":true,"online":true}}}}`
 	if string(v) != e {
 		t.Error()
 	}

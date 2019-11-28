@@ -109,8 +109,10 @@ func ExecuteQuery(r *query.Request, dvcs *devices.Mgr) (resp *query.Response, er
 	o := dvcs.Outlet
 	resp = &query.Response{
 		RequestID: r.RequestID,
-		Payload:   map[string]map[string]interface{}{
-			o.ID: map[string]interface{}{"on": o.On, "online": o.Online},
+		Payload:   query.Payload {
+			Devices: map[string]map[string]interface{}{
+				o.ID: map[string]interface{}{"on": o.On, "online": o.Online},
+			},
 		},
 	}
 	return resp, nil
