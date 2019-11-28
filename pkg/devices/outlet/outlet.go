@@ -5,6 +5,7 @@ import (
 )
 
 // Outlet .
+// TODO: mutex
 type Outlet struct {
 	ID     string
 	Name   string

@@ -19,6 +19,10 @@ type Request struct {
 	} `json:"inputs"`
 }
 
+const (
+	CommandOnOff = "action.devices.commands.OnOff"
+)
+
 // Response .
 type Response struct {
 	RequestID string  `json:"requestId"`
