@@ -68,6 +68,7 @@ func (s *MemStorage) SaveAccess(data *osin.AccessData) error {
 	log.Printf("SaveAccess: %s\n", data.AccessToken)
 	s.access[data.AccessToken] = data
 	if data.RefreshToken != "" {
+		log.Printf("SaveRefresh: %s\n", data.RefreshToken)
 		s.refresh[data.RefreshToken] = data.AccessToken
 	}
 	return nil

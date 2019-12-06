@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"log"
 	"github.com/minzhang2110/smart-home/pkg/devices"
 	"github.com/minzhang2110/smart-home/pkg/devices/outlet"
 	"github.com/minzhang2110/smart-home/pkg/oauth"
@@ -34,6 +35,7 @@ func (h *Handler) SmartHomeHandler(w http.ResponseWriter, r *http.Request) {
 	h.dvcs.SetAgentUserID(userName)
 
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
-	// fmt.Fprint(w, intents.Execute(v, h.dvcs))
-	w.Write(intents.Execute(v, h.dvcs))
+	data := intents.Execute(v, h.dvcs)
+	w.Write(data)
+	log.Printf("[raw] req: %s, resp: %s", string(v), string(data))
 }
